@@ -171,8 +171,8 @@ class _IncrementPopupState extends State<IncrementPopup> {
   Widget build(BuildContext context) {
     return Overlay.wrap(
       alwaysSizeToContent: true,
-      child: Card(
-        margin: EdgeInsets.zero,
+      child: ColoredBox(
+        color: Theme.of(context).colorScheme.surfaceDim,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(

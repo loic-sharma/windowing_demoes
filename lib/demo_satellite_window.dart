@@ -27,7 +27,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   final controller = WindowController(
-    size: const Size(500, 400),
+    size: const Size(575, 450),
     title: 'Counter',
     delegate: MainWindowDelegate(),
   );
@@ -73,7 +73,7 @@ class _CounterPageState extends State<CounterPage> {
   SatelliteWindowController _createSatellite() {
     return SatelliteWindowController(
       parent: widget.windowController,
-      size: const Size(200, 400),
+      size: const Size(200, 200),
       title: 'Controls',
       // With no anchor rectangle, the satellite is positioned relative to the
       // main window. Place its top-left corner just right of the main

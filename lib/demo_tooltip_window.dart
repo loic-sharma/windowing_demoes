@@ -163,23 +163,16 @@ class IncrementTooltip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Overlay.wrap(
-      alwaysSizeToContent: true,
-      child: Card(
-        margin: EdgeInsets.zero,
+    return ColoredBox(
+      color: Colors.grey[700]!.withValues(alpha: 0.9),
+      child: DefaultTextStyle.merge(
+        style: const TextStyle(color: Colors.white),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(8),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Increment tooltip',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              const Text('Increment by 1'),
-            ],
+            children: [Text('Increment', style: TextStyle(fontSize: 24))],
           ),
         ),
       ),
