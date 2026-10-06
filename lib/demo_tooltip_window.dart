@@ -1,8 +1,8 @@
 // ignore_for_file: invalid_use_of_internal_member
 // ignore_for_file: implementation_imports
 
-// A plain Material counter app. Pressing the increment button opens a native
-// popup window where you can choose how much to increment the counter by.
+// A plain Material counter app. Hovering over the increment button shows a
+// native tooltip window.
 //
 // Run with: flutter run -d macos -t lib/demo_tooltip_window.dart
 
@@ -36,7 +36,6 @@ void main() {
       child: MaterialApp(
         title: 'Counter',
         debugShowCheckedModeBanner: false,
-        // theme: ThemeData(colorSchemeSeed: Colors.deepPurple),
         home: CounterPage(windowController: controller),
       ),
     ),
@@ -59,29 +58,27 @@ class _CounterPageState extends State<CounterPage> {
 
   TooltipWindowController? _tooltip;
 
-  void _toggleTooltip() {
+  void _showTooltip() {
     if (_tooltip != null) {
-      _tooltip!.destroy();
       return;
     }
 
-    // The popup is positioned relative to this rectangle, in the main
+    // The tooltip is positioned relative to this rectangle, in the main
     // window's coordinates.
     final box = _buttonKey.currentContext!.findRenderObject()! as RenderBox;
     final Rect buttonRect = box.localToGlobal(Offset.zero) & box.size;
 
-    final popup = TooltipWindowController(
+    final tooltip = TooltipWindowController(
       parent: widget.windowController,
       anchorRect: buttonRect,
-      // Place the popup's bottom-right corner just above the button's
-      // top-right corner.
+      // Place the tooltip's bottom-left corner just above the button's
+      // top-left corner.
       positioner: const WindowPositioner(
         parentAnchor: WindowPositionerAnchor.topLeft,
         childAnchor: WindowPositionerAnchor.bottomLeft,
         offset: Offset(0, -8),
       ),
       delegate: TooltipDelegate(
-        // Popups also close when another window gets focus.
         onDestroyed: () {
           if (mounted) {
             setState(() => _tooltip = null);
@@ -90,16 +87,20 @@ class _CounterPageState extends State<CounterPage> {
       ),
     );
 
-    setState(() => _tooltip = popup);
+    setState(() => _tooltip = tooltip);
   }
 
-  void _increment(int amount) {
-    setState(() => _counter += amount);
+  void _hideTooltip() {
+    _tooltip?.destroy();
+  }
+
+  void _increment() {
+    setState(() => _counter++);
   }
 
   @override
   Widget build(BuildContext context) {
-    final TooltipWindowController? popup = _tooltip;
+    final TooltipWindowController? tooltip = _tooltip;
 
     return Scaffold(
       appBar: AppBar(
@@ -118,30 +119,21 @@ class _CounterPageState extends State<CounterPage> {
           ],
         ),
       ),
-      // The popup window's content is built here so that it inherits the
+      // The tooltip window's content is built here so that it inherits the
       // app's theme.
       floatingActionButton: ViewAnchor(
-        view: popup == null
+        view: tooltip == null
             ? null
             : TooltipWindow(
-                controller: popup,
-                child: IncrementTooltip(onIncrement: _increment),
+                controller: tooltip,
+                child: const IncrementTooltip(),
               ),
         child: MouseRegion(
-          onEnter: (_) {
-            if (popup == null) {
-              _toggleTooltip();
-            }
-          },
-          onExit: (_) {
-            if (popup != null) {
-              _toggleTooltip();
-            }
-          },
+          onEnter: (_) => _showTooltip(),
+          onExit: (_) => _hideTooltip(),
           child: FloatingActionButton(
             key: _buttonKey,
-            onPressed: () => _increment(1),
-            // tooltip: 'Increment',
+            onPressed: _increment,
             child: const Icon(Icons.add),
           ),
         ),
@@ -162,14 +154,12 @@ class TooltipDelegate with TooltipWindowControllerDelegate {
   }
 }
 
-/// The content of the popup window.
+/// The content of the tooltip window.
 ///
-/// Popup windows are borderless and transparent, so the popup draws its own
-/// card background. The window sizes itself to fit this content.
+/// Tooltip windows are borderless and transparent, so the tooltip draws its
+/// own card background. The window sizes itself to fit this content.
 class IncrementTooltip extends StatelessWidget {
-  const IncrementTooltip({super.key, required this.onIncrement});
-
-  final ValueChanged<int> onIncrement;
+  const IncrementTooltip({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -188,7 +178,7 @@ class IncrementTooltip extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
-              Text('Increment by 1'),
+              const Text('Increment by 1'),
             ],
           ),
         ),
